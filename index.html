@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Geodata AS - Demo</title>
+    <title>Geodata AS - Forenklet siktanalyse</title>
     <link rel="icon" type="image/png" href="./images/geodata-16x16.png" sizes="16x16">
     <link rel="icon" type="image/png" href="./images/geodata-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="./images/geodata-96x96.png" sizes="96x96">
@@ -38,12 +38,12 @@
         <calcite-shell-panel slot="primary-panel" detached>
   
           <calcite-action-bar slot="action-bar" intl-collapse="Minimere" intl-expand="Maksimere">
+            <calcite-action data-action-id="viewshed" icon="viewshed" text="Siktanalyse"></calcite-action>
             <calcite-action data-action-id="layers" icon="layers" text="Kartlag"></calcite-action>
             <calcite-action data-action-id="basemaps" icon="basemap" text="Bakgrunnskart"></calcite-action>
             <calcite-action data-action-id="legend" icon="legend" text="Tegnforklaring"></calcite-action>
             <calcite-action data-action-id="bookmarks" icon="bookmark" text="Bokmerker"></calcite-action>
             <calcite-action data-action-id="print" icon="print" text="Utskrift"></calcite-action>
-            <calcite-action data-action-id="information" icon="information" text="Informasjon"></calcite-action>
           </calcite-action-bar>
   
           <!-- map-specific panels (each one provides a div for JS API widgets) -->
@@ -63,20 +63,19 @@
             <div id="print-container"></div>
           </calcite-panel>
   
-          <!-- info panel (populates with info from the web map) -->
-          <calcite-panel heading="Informasjon" data-panel-id="information" hidden>
-            <div id="info-content">
-              <img id="item-thumbnail" />
-              <div id="item-description">
-                <!--dynamically populated-->
-              </div>
-              <calcite-label layout="inline">
-                <b>Vurdering:</b>
-                <calcite-rating read-only>
-                  <!--dynamically populated-->
-                </calcite-rating>
-              </calcite-label>
-            </div>
+           <!-- Map locations panel -->
+           <calcite-panel heading="Siktanalyse" data-panel-id="viewshed">
+            <calcite-block heading="Lokasjoner" summary="Klikk i kartet for å legge til utkikkspunkter" open>
+              <calcite-icon slot="icon" icon="pins"></calcite-icon>
+              <calcite-value-list id="locations-list"></calcite-value-list>
+            </calcite-block>
+            <calcite-block heading="Innstillinger" summary="Sett innstillinger for analysen" open>
+              <calcite-icon slot="icon" icon="gear"></calcite-icon>
+              <calcite-label>Analyseradius:</calcite-label>
+              <calcite-slider id="radius-slider" max-label="500 m" max="500" min-label="100 m" min="100" snap ticks="100" value="200" label-ticks>
+              </calcite-slider>
+              <calcite-button id="delete-all-btn">Slett analyse</calcite-button>
+            </calcite-block>
           </calcite-panel>
   
         </calcite-shell-panel>
