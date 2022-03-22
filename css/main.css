@@ -40,10 +40,6 @@ calcite-loader {
   cursor: pointer;
 }
 
-#info-content {
-  padding: 0.75rem;
-}
-
-calcite-rating {
-  margin-top: 0.25rem;
+.splash-help-image {
+  max-width: 730px;
 }

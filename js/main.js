@@ -26,6 +26,7 @@ const map = new Map({
 const view = new MapView({
   map,
   extent: startExtent.extent,
+  scale: 10000,
   container: "viewDiv",
   padding: {
     left: 49
@@ -49,19 +50,17 @@ view.whenLayerView(obstructionsLayer).then(layerView => {
   })
 })
 
-
 const actionBar = new ActionBar(view, 'viewshed')
-const locationsList = new MapLocationList('locations', view)
+const locationsList = new MapLocationList('locations', view, locationsLayer)
 mapTheme.view = view
 
 view.on("click", event => {
-  locationsList.addLocation(new MapLocation(locationsLayer, event.mapPoint))
+  locationsList.addLocation(new MapLocation(event.mapPoint))
   visibleArea.calculateVisibleArea(event.mapPoint)
 })
 
 const deleteAll = () => {
-  let layers = [locationsLayer, visibleareasLayer]
-  layers.forEach(layer => {layer.removeAll()})
+  visibleareasLayer.removeAll()
   locationsList.deleteAll()
 }
 

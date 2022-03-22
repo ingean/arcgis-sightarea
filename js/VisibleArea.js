@@ -12,14 +12,17 @@ export default class VisibleArea {
     this.obstructionsLayer = obstructionsLayer
     this.visibleareasLayer = visibleareasLayer
     this.obstructions = null 
+    this.visibleAreas = []
+    this.spatialReference = null
     
     //this.getObstructions(obstructionsLayer)
   }
 
   calculateVisibleArea = (analysisLocation, numberOfPoints) => {
+    this.spatialReference = analysisLocation.spatialReference
 
     const searchArea = new Circle({
-      spatialReference: analysisLocation.spatialReference,
+      spatialReference: this.spatialReference,
       geodesic: false,
       center: analysisLocation,
       radius: this.getRadius() || 100,
@@ -63,29 +66,51 @@ export default class VisibleArea {
   
     // VISIBLE AREA //
     const visibleArea = new Polygon({
-      spatialReference: analysisLocation.spatialReference,
+      spatialReference: this.spatialReference,
       rings: [sightlineFootprintIntersections]
     })
 
-    this.addVisibleArea(visibleArea)
+    //this.addVisibleArea(visibleArea)
+    this.addVisibleAreaUnion(visibleArea)
   }
 
   getRadius = () => {
     return document.querySelector('#radius-slider').value
   }
 
-  addIntersection = (intersection, isNearest) => {
-    this.intersectionsLayer.add(new Graphic({ geometry: intersection, attributes: { nearest: isNearest ? "nearest" : "not-nearest" } }))
-  }
-
-  addSightline = (sightline) => {
-    this.sightlinesLayer.add(new Graphic({ geometry: sightline }))
-  }
-
   addVisibleArea = (visibleArea) => {
     this.visibleareasLayer.add(
       new Graphic({ 
         geometry: visibleArea,
+        symbol: visibleSymbol 
+      })
+    )
+  }
+
+  addVisibleAreaUnion = (newVisibleArea) => {
+    this.visibleAreas.push(newVisibleArea)
+    
+    const visibleAreasPolygon = new Polygon({
+      spatialReference: this.spatialReference,
+      rings: []
+    })
+
+    // IS SELF INTERSECTING //
+    let selfIntersecting = false
+    this.visibleAreas.forEach((visibleArea) => {
+      if(geometryEngine.intersects(visibleAreasPolygon, visibleArea)) {
+        selfIntersecting = true
+      }
+      visibleAreasPolygon.addRing(visibleArea.rings[0])
+    });
+
+    // VISIBLE AREAS UNION //
+    const visibleAreasUnion = selfIntersecting ? geometryEngine.union(this.visibleAreas) : visibleAreasPolygon
+    
+    this.visibleareasLayer.removeAll()
+    this.visibleareasLayer.add(
+      new Graphic({ 
+        geometry: visibleAreasUnion,
         symbol: visibleSymbol 
       })
     )

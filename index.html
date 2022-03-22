@@ -34,6 +34,14 @@
         </h2>
   
         <calcite-loader active></calcite-loader>
+        <calcite-modal aria-labelledby="modal-title" active>
+          <div slot="header" id="modal-title">Forenklet synlighetsanalyse</div>
+          <div slot="content">
+            <img class="splash-help-image" src="./images/analysissample.png">
+            Denne applikasjonen finner synlige områder fra ett eller flere valgte lokasjoner i kartet. Analysen tar hensyn til bygninger, men ikke terreng.
+            Zoom inn i Oslo sentrum til du ser kartlaget med bygninger slå seg på og klikk i kartet for å sette ut en lokasjon og starte analysen.
+          </div>
+        </calcite-modal>
 
         <calcite-shell-panel slot="primary-panel" detached>
   
