@@ -18,4 +18,5 @@ In main.css set the color scheme for dark themed browser controls e.g. scrollbar
   color-scheme: dark; /* Dark style scrollbars etc.*/
 }
 ```
-
+## Development
+Use machine name address, not localhost for API-key to work

@@ -6,7 +6,7 @@ import GraphicsLayer from 'https://js.arcgis.com/4.22/@arcgis/core/layers/Graphi
 import ActionBar from './ActionBar.js'
 import MapTheme from './MapTheme.js'
 import MapLocation from './MapLocation.js'
-import VisibleArea from './VisibleArea.js'
+import VisibilityAnalysis from './VisibilityAnalysis.js'
 import MapLocationList from './MapLocationList.js'
 
 esriConfig.apiKey = 'AAPKf28ba4fdd1e945a1be5f8d43dbd650eaMjyiDjdFXaCPZzo5erYJ7Xc7XKvBlbJZIPvNu0O2zwfeFiGhqoBvtQwJUZ1DMXIL'
@@ -33,38 +33,60 @@ const view = new MapView({
   }
 })
 
-const locationsLayer = new GraphicsLayer({title: "Lokasjoner"})
-const visibleareasLayer = new GraphicsLayer({title: "Synlige områder"})
-map.addMany([obstructionsLayer, visibleareasLayer, locationsLayer])
-const visibleArea = new VisibleArea(obstructionsLayer, visibleareasLayer)
-
 view.whenLayerView(obstructionsLayer).then(layerView => {
   layerView.watch('updating', val => {
     if (!val) {  // Wait for the layerView to finish updating
       layerView.queryFeatures().then(results => {
         let obstructions = []
         results.features.forEach(feature => obstructions.push(feature.geometry))
-        visibleArea.obstructions = obstructions
+        visibilityAnalysis.obstructions = obstructions
       })
     }
   })
 })
 
+const locationsLayer = new GraphicsLayer({title: "Lokasjoner"})
+const visibleareasLayer = new GraphicsLayer({title: "Synlige områder"})
+map.addMany([obstructionsLayer, visibleareasLayer, locationsLayer])
+
 const actionBar = new ActionBar(view, 'viewshed')
-const locationsList = new MapLocationList('locations', view, locationsLayer)
+const visibilityAnalysis = new VisibilityAnalysis(obstructionsLayer, visibleareasLayer, actionBar.sketchLayer)
+const locationsList = new MapLocationList('locations', view, locationsLayer, visibilityAnalysis)
 mapTheme.view = view
 
+
+
+let analysisActive = true
+
 view.on("click", event => {
+  if (!analysisActive) return
   locationsList.addLocation(new MapLocation(event.mapPoint))
-  visibleArea.calculateVisibleArea(event.mapPoint)
+  visibilityAnalysis.solve(event.mapPoint)
 })
 
 const deleteAll = () => {
-  visibleareasLayer.removeAll()
-  locationsList.deleteAll()
+  locationsList.removeAll()
+  visibilityAnalysis.removeAllResults()
 }
 
 document.querySelector("#header-title").textContent = 'Finn synlige områder for valgte lokasjoner'
 document.querySelector("calcite-shell").hidden = false
 document.querySelector("calcite-loader").active = false
 document.querySelector('#delete-all-btn').addEventListener('click', deleteAll)
+
+document.querySelector('#aoi-edit-switch')
+.addEventListener('calciteSwitchChange', event => {
+  let widget = actionBar.widgets.sketch
+  let sketchVM = widget.viewModel
+  
+  if (event.target.checked) {
+    widget.visible = true
+    sketchVM.updateOnGraphicClick = true
+    analysisActive = false
+
+  } else {
+    widget.visible = false
+    sketchVM.updateOnGraphicClick = false
+    analysisActive = true
+  }
+})

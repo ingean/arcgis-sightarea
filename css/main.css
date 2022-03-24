@@ -35,11 +35,43 @@ calcite-loader {
   background-color: var(--calcite-ui-foreground-1);
 }
 
+.action-panel {
+  height: 100vh;
+}
+
 .theme-icon {
   padding: 0.5rem;
   cursor: pointer;
 }
 
 .splash-help-image {
-  max-width: 730px;
+  max-width: 700px;
+}
+
+#aoi-edit-switch {
+  margin-left: auto;
+}
+
+#area-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.indicator {
+  text-align: center;
+  min-width: 80px;
+}
+
+.indicator-number {
+  font-size: x-large;
+  font-weight: 400;
+}
+
+.indcator-unit {
+  font-size: medium;
+}
+
+.indicator-caption {
+  font-size: small;
 }

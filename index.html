@@ -34,13 +34,26 @@
         </h2>
   
         <calcite-loader active></calcite-loader>
-        <calcite-modal aria-labelledby="modal-title" active>
+        <calcite-modal id="splash-modal" scale="l" aria-labelledby="modal-title" active>
           <div slot="header" id="modal-title">Forenklet synlighetsanalyse</div>
-          <div slot="content">
-            <img class="splash-help-image" src="./images/analysissample.png">
-            Denne applikasjonen finner synlige områder fra ett eller flere valgte lokasjoner i kartet. Analysen tar hensyn til bygninger, men ikke terreng.
-            Zoom inn i Oslo sentrum til du ser kartlaget med bygninger slå seg på og klikk i kartet for å sette ut en lokasjon og starte analysen.
-          </div>
+          <calcite-accordion slot="content" selection-mode="single-persist">
+            <calcite-accordion-item icon="viewshed" item-title="Introduksjon" item-subtitle="Hva kan denne appen hjelpe deg med" active>
+              <img class="splash-help-image" src="./images/analysissample.png">
+              Denne applikasjonen finner synlige områder fra ett eller flere valgte lokasjoner i kartet. Analysen tar hensyn til bygninger, men ikke terreng.
+              Det er også mulig å beregne hvor stor andel av et interesseområde som er synlig.
+            </calcite-accordion-item>
+            <calcite-accordion-item icon="pins" item-title="Utføre en ny analyse" item-subtitle="Legge til nye utkikkspunkter for å beregne synlighet">
+              Zoom inn i Oslo sentrum til du ser kartlaget med bygninger slå seg på (disse benyttes som visuelle hindringer i analysen). Klikk i kartet for å sette ut et nytt utkikkspunkt. 
+              Det valgte punktet vises i kartet og listen til venstre. Fra listen kan du slette ett eller alle utkikkspunkt for å starte en ny analyse.
+              Resultatet av analysen vises som flater i kartet. Dersom disse overlapper, slås de sammen til en sammenhengende flate.
+              Se også i panelet til venstre for statisikk om det synlige området (areal, andel overlapp og dekning)
+            </calcite-accordion-item>
+            <calcite-accordion-item icon="gear" item-title="Legge til interesseområde" item-subtitle="Beregne dekningsgrad for et område">
+              <img class="splash-help-image" src="./images/aoisample.png">
+              Det er mulig å tegne inn et interesseområde, for å beregne hvor stor andel av dette som er synlig. Aktivere registrering av interesseområdet under "Innstillinger" i 
+              panelet til venstre og bruk verktøylinjen som vises i kartet til å tegne en eller flere flater. Legg til ett eller flere analysepunkter for å beregne dekningsgrad.
+            </calcite-accordion-item>
+          </calcite-accordion>
         </calcite-modal>
 
         <calcite-shell-panel slot="primary-panel" detached>
@@ -72,18 +85,43 @@
           </calcite-panel>
   
            <!-- Map locations panel -->
-           <calcite-panel heading="Siktanalyse" data-panel-id="viewshed">
-            <calcite-block heading="Lokasjoner" summary="Klikk i kartet for å legge til utkikkspunkter" open>
+           <calcite-panel heading="Siktanalyse" data-panel-id="viewshed" class="action-panel">
+            <calcite-block heading="Innstillinger" summary="Sett innstillinger for analysen" collapsible open>
+              <calcite-icon slot="icon" icon="gear"></calcite-icon>
+              <calcite-block-section text="Analyseradius">
+                <calcite-slider id="radius-slider" max-label="500 m" max="500" min-label="100 m" min="100" snap ticks="100" value="200" label-ticks>
+                </calcite-slider>
+              </calcite-block-section>
+              <calcite-block-section text="Interesseområde" open>
+                <calcite-label layout="inline">Aktivere registrering / redigering<calcite-switch id="aoi-edit-switch"></calcite-switch>
+                </calcite-label>
+              </calcite-block-section>
+            </calcite-block>
+            <calcite-block heading="Resultater" summary="Synlig areal i tall" collapsible open>
+              <calcite-icon slot="icon" icon="dashboard"></calcite-icon>
+              <div id="area-info">
+                <div class="indicator">
+                  <span id="total-area" class="indicator-number">0</span>
+                  <span id="total-area-unit" class="indicator-unit"></span>
+                  <div class="indicator-caption">Samlet areal</div>
+                </div>
+                <div class="indicator">
+                  <span id="overlap-area" class="indicator-number">0</span>
+                  <span class="indicator-unit">%</span>
+                  <div class="indicator-caption">Overlapp</div>
+                </div>
+                <div class="indicator">
+                  <span id="coverage-area" class="indicator-number">0</span>
+                  <span class="indicator-unit">%</span>
+                  <div class="indicator-caption">Dekning</div>
+                </div>
+              </div>
+            </calcite-block>
+            <calcite-block heading="Lokasjoner" summary="Klikk i kartet for å legge til utkikkspunkter" collapsible open>
               <calcite-icon slot="icon" icon="pins"></calcite-icon>
               <calcite-value-list id="locations-list"></calcite-value-list>
             </calcite-block>
-            <calcite-block heading="Innstillinger" summary="Sett innstillinger for analysen" open>
-              <calcite-icon slot="icon" icon="gear"></calcite-icon>
-              <calcite-label>Analyseradius:</calcite-label>
-              <calcite-slider id="radius-slider" max-label="500 m" max="500" min-label="100 m" min="100" snap ticks="100" value="200" label-ticks>
-              </calcite-slider>
-              <calcite-button id="delete-all-btn">Slett analyse</calcite-button>
-            </calcite-block>
+            <calcite-button id="delete-all-btn" iconStart="Trash" slot="footer-actions">Slett alle</calcite-button>
           </calcite-panel>
   
         </calcite-shell-panel>
